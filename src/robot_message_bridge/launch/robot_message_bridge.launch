@@ -1,0 +1,4 @@
+<launch>
+  <node name="robot_msg_manager_node" pkg="robot_message_bridge" type="dms_to_robot.py" output="screen">
+  </node>
+</launch>

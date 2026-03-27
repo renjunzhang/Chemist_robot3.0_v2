@@ -1,0 +1,27 @@
+Log file created at: 2024/01/03 22:48:31
+Running on machine: HF-chemical
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+W0103 22:48:31.087220 3003464 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W0104 00:28:03.437425 3003464 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W0104 00:36:16.237203 3003464 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W0104 00:44:34.787097 3003464 platform_communication.cpp:776] charge errorold_quantity is87new_quantity is87
+W0104 00:52:46.937212 3003464 platform_communication.cpp:776] charge errorold_quantity is86new_quantity is86
+W0104 01:01:04.487174 3003464 platform_communication.cpp:776] charge errorold_quantity is85new_quantity is85
+W0104 01:09:14.887137 3003464 platform_communication.cpp:776] charge errorold_quantity is84new_quantity is84
+W0104 02:59:23.087168 3003464 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W0104 04:38:54.787122 3003464 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W0104 04:47:06.386996 3003464 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W0104 04:55:24.837600 3003464 platform_communication.cpp:776] charge errorold_quantity is87new_quantity is87
+W0104 08:08:22.737072 3003464 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W0104 08:16:35.137153 3003464 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W0104 08:24:52.237062 3003464 platform_communication.cpp:776] charge errorold_quantity is87new_quantity is87
+W0104 10:08:39.737140 3003464 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W0104 21:42:18.787209 1582778 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W0104 23:22:01.062295 1582778 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W0104 23:30:11.587103 1582778 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W0104 23:38:32.212090 1582778 platform_communication.cpp:776] charge errorold_quantity is87new_quantity is87
+W0104 23:46:43.887187 1582778 platform_communication.cpp:776] charge errorold_quantity is86new_quantity is86
+W0105 01:32:44.787101 1582778 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W0105 01:40:57.662060 1582778 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W0105 01:49:16.712148 1582778 platform_communication.cpp:776] charge errorold_quantity is87new_quantity is87
+W0105 01:57:29.037285 1582778 platform_communication.cpp:776] charge errorold_quantity is86new_quantity is86

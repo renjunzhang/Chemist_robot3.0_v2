@@ -1,0 +1,41 @@
+map_type: costmap
+
+# Coordinate frame and tf parameters
+transform_tolerance: 0.5
+
+origin_z: 0.0
+z_resolution: 1
+z_voxels: 2
+
+
+# track_unknown_space: true
+publish_voxel_map: false
+meter_scoring: true
+
+# 航发平台 [0.4706, 0.3975]
+#实际0.47 0.40
+footprint: [[0.52, -0.42], [0.52, 0.42], [-0.52, 0.42], [-0.52, -0.42]]
+footprint_padding: 0.01
+
+plugins:
+- {name: obstacles_layer, type: "costmap_2d::ObstacleLayer"}
+- {name: inflater_layer, type: "costmap_2d::InflationLayer"}
+
+obstacles_layer:
+  observation_sources: scan
+  scan: {
+    sensor_frame: scan_merge, 
+    data_type: LaserScan, 
+    topic: /scan_full_filtered, 
+    marking: true, 
+    clearing: true, 
+    min_obstacle_height: -0.4,
+     max_obstacle_height: 2.0, 
+     obstacle_range: 2.5, 
+     raytrace_range: 3, 
+     inf_is_valid: true}
+
+# 膨胀半径, 根据机器人大小设置,之前有碰撞应该是这个的问题
+inflater_layer:
+ inflation_radius: 0.9 #0.45
+ cost_scaling_factor: 10.0

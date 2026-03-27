@@ -1,0 +1,31 @@
+<launch>
+    <arg name="robot_name" default="hf_0" />
+    <arg name="pose_topic" default="/amcl_pose_tf" />
+    <arg name="host_ip" default="192.168.1.170" />
+    <arg name="debug" default="false" />
+    <arg name="aruco_id" default="47" />
+
+    <node name="$(anon record_platform_pose_node)" pkg="task_communication"
+        type="record_platform_pose_carto.py" output="screen" />
+
+    <!-- <node name="platform_communication_node" pkg="task_communication"
+        type="multi_communication.py"
+        args="-aruco_id $(arg aruco_id)
+    -station_pose_path $(find task_communication)/station_cfg/201_0930/station_english_new.json
+    -camera_pose_path ~/speed_develop/config/camera_pose.json"
+        output="screen">
+        <param name="robot_name" value="$(arg robot_name)" />
+        <param name="pose_topic" value="$(arg pose_topic)" />
+        <param name="host_ip" value="$(arg host_ip)" />
+        <param name="debug" value="$(arg debug)" />
+    </node> -->
+
+    <node name="platform_communication_node" pkg="task_communication"
+        type="platform_communication_node"
+        args="-aruco_id 47
+    -station_pose_path $(find task_communication)/station_cfg/201_0930/station_english_new.json
+    -camera_pose_path $(env HOME)/speed_develop/config/camera_pose.json"
+        output="screen">
+    </node>
+
+</launch>

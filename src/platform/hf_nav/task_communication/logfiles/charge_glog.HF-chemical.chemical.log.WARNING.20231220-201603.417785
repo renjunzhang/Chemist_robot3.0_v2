@@ -1,0 +1,36 @@
+Log file created at: 2023/12/20 20:16:03
+Running on machine: HF-chemical
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+W1220 20:16:03.009963 1508355 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1221 03:54:16.435400 1508355 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1221 05:34:16.309809 1508355 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1221 07:14:17.059939 1508355 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1221 07:22:27.835381 1508355 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W1221 09:04:28.909930 1508355 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1221 13:21:50.709913 3931704 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1221 13:30:04.434986 3931704 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W1221 13:38:23.785238 3931704 platform_communication.cpp:776] charge errorold_quantity is87new_quantity is87
+W1221 13:46:42.209895 3931704 platform_communication.cpp:776] charge errorold_quantity is86new_quantity is86
+W1221 18:23:41.684948 712628 platform_communication.cpp:776] charge errorold_quantity is49new_quantity is49
+W1221 18:31:47.985010 712628 platform_communication.cpp:776] charge errorold_quantity is48new_quantity is48
+W1221 21:39:29.035135 712628 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1221 21:47:44.484885 712628 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W1222 00:59:01.360117 712628 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1222 01:07:14.434991 712628 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W1222 01:15:35.460160 712628 platform_communication.cpp:776] charge errorold_quantity is87new_quantity is87
+W1222 04:29:08.409957 712628 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1222 04:37:21.234846 712628 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W1222 04:45:42.284899 712628 platform_communication.cpp:776] charge errorold_quantity is87new_quantity is87
+W1222 22:14:13.281463 4103433 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1222 22:22:25.781630 4103433 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W1223 00:04:12.331457 4103433 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1223 00:12:26.632308 4103433 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W1223 01:54:13.781548 4103433 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1223 02:02:27.506441 4103433 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W1223 03:44:18.806517 4103433 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1223 03:52:32.281682 4103433 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W1223 04:00:50.556694 4103433 platform_communication.cpp:776] charge errorold_quantity is87new_quantity is87
+W1223 04:09:08.606621 4103433 platform_communication.cpp:776] charge errorold_quantity is86new_quantity is86
+W1223 05:55:19.681869 4103433 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1223 07:34:57.106542 4103433 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1223 07:43:08.306424 4103433 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88

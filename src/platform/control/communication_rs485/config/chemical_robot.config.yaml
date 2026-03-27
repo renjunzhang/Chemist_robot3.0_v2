@@ -1,0 +1,18 @@
+axis_linear_x: 0 
+axis_linear_y: 1
+axis_angular: 2
+
+# linear 1 m/s
+# angular 1 度/s
+scale_linear: 0.2  # 每 100 为 1cm/s
+scale_angular: 0.167266  # 1 rad/s
+
+# 充电按键
+charge_button: 1
+# 清除里程计按键
+clear_button: 0
+
+# 使能按键，按下此键其他按键才有用
+enable_button: 5  
+# 释放手柄控制，使能导航速度
+release_nav_button: 4

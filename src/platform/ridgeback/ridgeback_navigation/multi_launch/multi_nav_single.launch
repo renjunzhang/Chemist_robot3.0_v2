@@ -1,0 +1,47 @@
+<launch>
+    <arg name="robot_name" default="rb_0" />
+    <arg name="initial_pose_x" default="0" />
+    <arg name="initial_pose_y" default="0" />
+    <arg name="initial_pose_a" default="0" />
+
+    <!-- <arg name="map_file" default="$(find ridgeback_navigation)/maps/rgmap_0217.yaml" /> -->
+    <!-- <arg name="map_file" default="$(find ridgeback_navigation)/maps/rglab_0905.yaml" /> -->
+    <arg name="map_file" default="$(find ridgeback_navigation)/maps/carto_map.yaml" />
+    <arg name="load_state_filename" default="$(find ridgeback_navigation)/maps/carto_map.pbstream" />
+
+    <group ns="$(arg robot_name)">
+        <!-- Run the map server -->
+        <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+        <!---
+        Run AMCL -->
+        <!-- <include file="$(find ridgeback_navigation)/multi_launch/include/multi_amcl.launch">
+            <arg name="scan_topic" value="scan_full_filtered" />
+            <arg name="initial_pose_x" value="$(arg initial_pose_x)" />
+            <arg name="initial_pose_y" value="$(arg initial_pose_x)" />
+            <arg name="initial_pose_a" value="$(arg initial_pose_x)" />
+            <arg name="odom_frame_id" value="$(arg robot_name)/odom" />
+            <arg name="base_frame_id" value="$(arg robot_name)/base_link" />
+        </include> -->
+
+        <!---Run
+        Cartographer -->
+        <include
+            file="$(find ridgeback_navigation)/multi_launch/include/multi_carto_localization.launch">
+            <arg name="load_state_filename" value="$(arg load_state_filename)" />
+            <arg name="params_file_name" value="$(arg robot_name)" />
+        </include>
+
+        <!-- Run amcl_pose_tf publisher, publish fast amcl pose -->
+        <node name="lidar_odometry_rg_node" pkg="ridgeback_test" type="lidar_odometry_rg_node">
+            <param name="tf_prefix" value="$(arg robot_name)" />
+        </node>
+
+        <!---
+        Run Move Base -->
+        <include file="$(find ridgeback_navigation)/multi_launch/include/multi_move_base.launch">
+            <arg name="params_file_name" value="$(arg robot_name)" />
+        </include>
+    </group>
+
+</launch>

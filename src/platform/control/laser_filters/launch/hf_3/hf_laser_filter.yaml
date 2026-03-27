@@ -1,0 +1,58 @@
+scan_filter_chain:
+# 机器人框架过滤
+- name: box_1
+  type: laser_filters/LaserScanBoxFilter
+  params:
+    # box_frame: hf_1/scan_merge
+    box_frame: scan_merge
+    min_x: -0.5
+    max_x: 0.5
+    min_y: -0.4
+    max_y: 0.4
+    min_z: -0.1
+    max_z: 0.1
+# 噪点
+- name: box_2
+  type: laser_filters/LaserScanBoxFilter
+  params:
+    box_frame: scan_merge
+    min_x: -0.45
+    max_x: -0.35
+    min_y: 0.42
+    max_y: 0.70
+    min_z: -0.1
+    max_z: 0.1
+- name: speckle_filter_1
+  type: laser_filters/LaserScanSpeckleFilter
+  params:
+    # Select which filter type to use.
+    # 0: Range based filtering (distance between consecutive points)
+    # 1: Euclidean filtering based on radius outlier search
+    filter_type: 0
+
+    # Only ranges smaller than this range are taken into account
+    max_range: 4
+
+    # filter_type[0] (Distance): max distance between consecutive points
+    # filter_type[1] (RadiusOutlier): max distance between points
+    max_range_difference: 0.1
+
+    # filter_type[0] (Distance): Number of consecutive ranges that will be tested for max_distance
+    # filter_type[1] (RadiusOutlier): Minimum number of neighbors
+    filter_window: 6
+- name: speckle_filter_2
+  type: laser_filters/LaserScanSpeckleFilter
+  params:
+    filter_type: 0
+    max_range: 2
+    max_range_difference: 0.1
+    filter_window: 2
+
+- name: range_filter
+  type: laser_filters/LaserScanRangeFilter
+  params:
+    use_message_range_limits: false
+    lower_threshold: 0.1
+    upper_threshold: 40
+    lower_replacement_value: -.inf
+    upper_replacement_value: .inf

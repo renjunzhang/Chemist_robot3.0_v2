@@ -1,0 +1,23 @@
+<launch>
+    <arg name="params_file_name" default="rb_0" />
+
+    <!--pbstream的地址与名称 -->
+    <arg name="load_state_filename"
+        default="$(find ridgeback_navigation)/maps/carto_map.pbstream" />
+
+    <!-- 重定位初始位姿-->
+    <param name="localization" type="bool" value="true" />
+    <rosparam command="load" file="$(find
+    task_communication)/station_cfg/current_pose.yaml"></rosparam>
+
+    <node name="cartographer_node" pkg="cartographer_ros"
+        type="cartographer_node"
+        args="
+        -configuration_directory $(find ridgeback_navigation)/multi_params/$(arg params_file_name)/carto_config
+        -configuration_basename ridegback_carto_localization.lua
+        -load_state_filename $(arg load_state_filename)"
+        output="screen">
+        <remap from="scan" to="scan_full_filtered" />
+    </node>
+
+</launch>

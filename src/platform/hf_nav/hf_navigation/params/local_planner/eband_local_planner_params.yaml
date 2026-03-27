@@ -1,0 +1,49 @@
+EBandPlannerROS:
+
+  # Common Parameters
+  # Goal
+  xy_goal_tolerance: 0.005
+  yaw_goal_tolerance: 0.005
+
+  # Visualization Parameters
+  marker_lifetime: 0.5
+
+  # Elastic Band Parameters
+  eband_min_relative_overlap: 0.8
+
+  eband_internal_force_gain: 1
+  eband_external_force_gain: 2
+
+  eband_equilibrium_relative_overshoot: 0.75
+
+  num_iterations_eband_optimization: 5
+
+  costmap_weight: 10
+
+  # Trajectory Controller Parameters
+  max_vel_lin: 0.15
+  min_vel_lin: -0.15
+
+  max_vel_th: 0.2
+  min_vel_th: -0.2
+
+  # PID 控制参数
+  k_prop: 4.0
+  k_damp: 3.5
+
+  Ctrl_Rate: 10
+
+  max_acceleration: 0.15
+  max_translational_acceleration: 0.15
+  max_rotational_acceleration: 0.1
+
+  bubble_velocity_multiplier: 1.5
+  
+  differential_drive: false
+
+  # 当前点到目标点的旋转阈值
+  # 如果当前点到设置的目标点 goal 大于这个阈值
+  # 出发前要先旋转校正方向
+  rotation_correction_threshold: 20
+
+  rotation_threshold_multiplier: 10.0

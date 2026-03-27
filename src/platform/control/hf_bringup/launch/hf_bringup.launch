@@ -1,0 +1,74 @@
+<launch>
+    <arg name="robot_name" default="hf_0" />
+
+    <!-- ###################### 串口、joy控制 ##################### -->
+    <include file="$(find communication_rs485)/launch/telecontrol.launch" ns="hf_platform" />
+
+    <!-- ################### twist_mux 多速度输入控制 ########################### -->
+    <include file="$(find twist_mux)/launch/twist_mux.launch" ns="hf_platform" />
+
+    <!-- 激光雷达驱动 -->
+    <include file="$(find sick_safetyscanners)/launch/sick_safetyscanners.launch" />
+
+    <!-- hf_0雷达参数 -->
+    <!-- 右后z轴旋转135度 -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="hf_base_link_to_scan_rear"
+        args="-0.39 -0.317 0 -2.35619449012  0  0 hf_base_link scan_rear"
+        if="$(eval arg('robot_name') == 'hf_0')" />
+    <!-- 左前z轴旋转135度 -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="hf_base_link_to_scan_front"
+        args="0.393 0.32 0 0.814533  0  0 hf_base_link scan_front"
+        if="$(eval arg('robot_name') == 'hf_0')" />
+
+    <!-- hf_1雷达参数 -->
+    <!-- 右后z轴旋转135度 -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="hf_base_link_to_scan_rear"
+        args="-0.36 -0.28 0 -2.83619449012  0  0 hf_base_link scan_rear"
+        if="$(eval arg('robot_name') == 'hf_1')" />
+    <!-- 左前z轴旋转135度 -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="hf_base_link_to_scan_front"
+        args="0.405780 0.267494 0 0.440965  0  0 hf_base_link scan_front"
+        if="$(eval arg('robot_name') == 'hf_1')" />
+
+    <!-- hf_2雷达参数 -->
+    <!-- 右后z轴旋转135度 -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="hf_base_link_to_scan_rear"
+        args="-0.371 -0.275 0 -2.35  0  0 hf_base_link scan_rear"
+        if="$(eval arg('robot_name') == 'hf_2')" />
+    <!-- 左前z轴旋转135度 -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="hf_base_link_to_scan_front"
+        args="0.379 0.275 0 0.763  0  0 hf_base_link scan_front"
+        if="$(eval arg('robot_name') == 'hf_2')" />
+
+    <!-- hf_3雷达参数 -->
+    <!-- 右后z轴旋转135度 -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="hf_base_link_to_scan_rear"
+args="-0.382 -0.278 0 -2.32619449012  0  0 hf_base_link scan_rear"
+        if="$(eval arg('robot_name') == 'hf_3')" />
+    <!-- 左前z轴旋转135度 -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="hf_base_link_to_scan_front"
+        args="0.377 0.276 0 0.77  0  0 hf_base_link scan_front"
+        if="$(eval arg('robot_name') == 'hf_3')" />
+
+    <!-- hf_4雷达参数 -->
+    <!-- 右后z轴旋转135度 -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="hf_base_link_to_scan_rear"
+        args="-0.36 -0.285 0 -2.25  0  0 hf_base_link scan_rear"
+        if="$(eval arg('robot_name') == 'hf_4')" />
+    <!-- 左前z轴旋转135度 -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="hf_base_link_to_scan_front"
+        args="0.375 0.295 0 0.665  0  0 hf_base_link scan_front"
+        if="$(eval arg('robot_name') == 'hf_4')" />
+
+    <!-- 虚拟拼接雷达 -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="hf_base_link_to_scan_merge"
+        args="0 0 0 0 0 0 hf_base_link scan_merge" />
+
+    <!-- 激光雷达点云拼接 -->
+    <include file="$(find ira_laser_tools)/launch/laserscan_multi_merger_hf_single.launch" />
+
+    <!-- 激光雷达点云滤波 -->
+    <include file="$(find laser_filters)/launch/hf_laser_filter_single.launch">
+        <arg name="robot_name" value="$(arg robot_name)" />
+    </include>
+</launch>

@@ -1,0 +1,19 @@
+Log file created at: 2023/12/15 20:02:27
+Running on machine: HF-chemical
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+W1215 20:02:27.225823 151407 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1215 20:10:41.425568 151407 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W1215 20:18:59.925575 151407 platform_communication.cpp:776] charge errorold_quantity is87new_quantity is87
+W1216 02:31:04.775537 151407 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1216 02:39:16.875427 151407 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W1216 02:47:34.975611 151407 platform_communication.cpp:776] charge errorold_quantity is87new_quantity is87
+W1216 19:49:49.750620 3064664 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1216 19:58:06.000663 3064664 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W1216 21:40:07.550700 3064664 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1217 03:48:41.700630 3064664 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1217 05:28:40.000670 3064664 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1217 05:36:54.400507 3064664 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W1218 00:28:35.450592 1793967 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1218 06:36:26.550631 1793967 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W1218 06:44:37.200425 1793967 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W1218 06:52:56.725490 1793967 platform_communication.cpp:776] charge errorold_quantity is87new_quantity is87

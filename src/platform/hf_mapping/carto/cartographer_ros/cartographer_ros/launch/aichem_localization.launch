@@ -1,0 +1,54 @@
+<!--
+  Copyright 2016 The Cartographer Authors
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<launch>
+
+  <arg name="map_file" default="$(find cartographer_ros)/configuration_files/aichem_map1.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+  <!-- pbstream的地址与名称 -->
+  <arg name="load_state_filename" default="$(find cartographer_ros)/configuration_files/aichem_map1.pbstream"/>
+
+  <!-- 不使用bag的时间戳 -->
+  <param name="/use_sim_time" value="false" />
+
+  <!--  重定位初始位姿-->
+  <param name="/localization" type="bool" value = "true"/>
+  <rosparam command="load" file="$(find task_communication)/station_cfg/current_pose.yaml"></rosparam>
+
+  <!-- 启动cartographer -->
+  <node name="cartographer_node" pkg="cartographer_ros"
+      type="cartographer_node" args="
+          -configuration_directory $(find cartographer_ros)/configuration_files
+          -configuration_basename aichem_localization.lua
+          -load_state_filename $(arg load_state_filename)"
+      output="screen">
+    <remap from="scan" to="/scan_full_filtered" />
+    <remap from="odom" to="/odom" />
+  </node>
+
+  <!-- 启动map_server -->
+  <!-- 
+  <node name="map_server" pkg="map_server" type="map_server"
+      args="$(env HOME)/carto_ws/map/2d-1.yaml" /> 
+  -->
+
+  <!-- 启动rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" required="true"
+      args="-d $(find cartographer_ros)/configuration_files/aichem_carto.rviz" />
+
+
+</launch>

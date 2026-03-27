@@ -1,0 +1,4 @@
+Log file created at: 2023/11/13 15:23:42
+Running on machine: HF-chemical
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+W1113 15:23:42.118402 2976730 platform_communication.cpp:778] charge error

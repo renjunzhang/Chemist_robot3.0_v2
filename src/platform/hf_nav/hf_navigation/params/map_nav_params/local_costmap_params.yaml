@@ -1,0 +1,17 @@
+local_costmap:
+   global_frame: map
+   robot_base_frame: hf_base_link
+   update_frequency: 8.0
+   publish_frequency: 6.0
+   width: 20
+   height: 20
+   resolution: 0.02
+   static_map: false
+   rolling_window: true 
+   # inscribed_radius: 0.8  #轴心到底盘最近距离
+   # circumscribed_radius: 0.8
+
+   # plugins:
+   # # - {name: static_layer, type: "costmap_2d::StaticLayer"}
+   # - {name: obstacles_layer, type: "costmap_2d::ObstacleLayer"}
+   # - {name: inflater_layer, type: "costmap_2d::InflationLayer"}

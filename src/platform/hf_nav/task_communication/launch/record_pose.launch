@@ -1,0 +1,9 @@
+<launch>
+
+    <!-- Run the task_communication node -->
+    <node name="hf_record_pose_node" pkg="task_communication" type="hf_record_pose_node"
+        args="-stationJsonName $(find task_communication)/station_cfg/201_0930/station_english_new.json
+    -cameraJsonName $(env HOME)/speed_develop/config/camera_pose.json"
+        output="screen">
+    </node>
+</launch>

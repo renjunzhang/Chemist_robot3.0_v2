@@ -1,0 +1,8 @@
+*.log
+*.pyc
+.catkin_tools/
+.vscode/
+build/
+devel/
+logs/
+src/robot_message_bridge/Logger_file/

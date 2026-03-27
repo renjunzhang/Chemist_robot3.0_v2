@@ -1,0 +1,6 @@
+image: /home/chemical/speed/aichem_cartographer/src/cartographer_ros/cartographer_ros/configuration_files/aichem_map1.pgm
+resolution: 0.02
+origin: [-5.08972, -1.26978, 0.0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196

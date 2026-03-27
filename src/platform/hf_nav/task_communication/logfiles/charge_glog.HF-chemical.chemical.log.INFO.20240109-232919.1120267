@@ -1,0 +1,8 @@
+Log file created at: 2024/01/09 23:29:19
+Running on machine: HF-chemical
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+W0109 23:29:19.751479 1176960 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W0109 23:37:33.451251 1176960 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W0110 05:46:52.077028 1176960 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
+W0110 05:55:59.501245 1176960 platform_communication.cpp:776] charge errorold_quantity is88new_quantity is88
+W0110 07:37:55.326354 1176960 platform_communication.cpp:776] charge errorold_quantity is89new_quantity is89
