@@ -3,6 +3,9 @@
 .catkin_tools/
 .vscode/
 build/
+build_data/
 devel/
+devel_data/
 logs/
+logs_data/
 src/robot_message_bridge/Logger_file/
