@@ -1,0 +1,24 @@
+<launch>
+  <arg name="map_file" default="$(find ridgeback_navigation)/maps/carto_map.yaml" />
+  <arg name="load_state_filename" default="$(find ridgeback_navigation)/maps/carto_map.pbstream" />
+  <arg name="start_localization" default="true" />
+  <arg name="start_debug_tools" default="false" />
+  <arg name="start_rviz" default="false" />
+
+  <group if="$(arg start_localization)">
+    <include file="$(find none_move_base_bringup)/launch/include/ridgeback_sim_localization.launch">
+      <arg name="map_file" value="$(arg map_file)" />
+      <arg name="load_state_filename" value="$(arg load_state_filename)" />
+    </include>
+  </group>
+
+  <include file="$(find none_move_base_bringup)/launch/include/navigation_core.launch">
+    <arg name="local_config" value="$(find none_move_base_bringup)/config/local_controller_ridgeback_sim.yaml" />
+  </include>
+
+  <group if="$(arg start_debug_tools)">
+    <include file="$(find none_move_base_bringup)/launch/include/debug_tools.launch">
+      <arg name="start_rviz" value="$(arg start_rviz)" />
+    </include>
+  </group>
+</launch>

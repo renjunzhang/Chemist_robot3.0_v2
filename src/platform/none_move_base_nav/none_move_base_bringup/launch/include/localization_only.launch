@@ -1,0 +1,22 @@
+<launch>
+  <arg name="map_file" default="$(find hf_navigation)/saved_map/201_0930.yaml" />
+  <arg name="load_state_filename" default="$(find hf_navigation)/saved_map/201_0930.pbstream" />
+
+  <param name="/use_sim_time" value="false" />
+  <param name="localization" type="bool" value="true" />
+  <rosparam command="load" file="$(env HOME)/speed_develop/config/current_pose.yaml" />
+
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+  <node
+    name="cartographer_node"
+    pkg="cartographer_ros"
+    type="cartographer_node"
+    args="-configuration_directory $(find hf_carto)/config -configuration_basename hf_carto_localization.lua -load_state_filename $(arg load_state_filename)"
+    output="screen">
+    <remap from="scan" to="/scan_full_filtered" />
+    <remap from="odom" to="/odom" />
+  </node>
+
+  <node name="lidar_odometry_node" pkg="docking_tf" type="lidar_odometry" />
+</launch>

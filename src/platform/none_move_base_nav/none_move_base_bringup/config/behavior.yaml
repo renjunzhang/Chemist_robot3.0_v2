@@ -1,0 +1,9 @@
+move_behavior:
+  enabled: true
+
+terminal_adjust:
+  enabled: false
+  source: ""
+
+charge_behavior:
+  enabled: false

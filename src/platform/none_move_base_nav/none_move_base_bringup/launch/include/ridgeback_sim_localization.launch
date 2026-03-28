@@ -1,0 +1,20 @@
+<launch>
+  <arg name="map_file" default="$(find ridgeback_navigation)/maps/carto_map.yaml" />
+  <arg name="load_state_filename" default="$(find ridgeback_navigation)/maps/carto_map.pbstream" />
+
+  <param name="/use_sim_time" value="true" />
+  <param name="localization" type="bool" value="true" />
+
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+  <node
+    name="cartographer_node"
+    pkg="cartographer_ros"
+    type="cartographer_node"
+    args="-configuration_directory $(find ridgeback_navigation)/params/carto_config -configuration_basename ridegback_carto_localization.lua -load_state_filename $(arg load_state_filename)"
+    output="screen">
+    <remap from="scan" to="/scan_full_filtered" />
+  </node>
+
+  <node name="lidar_odometry_rg_single_node" pkg="ridgeback_test" type="lidar_odometry_rg_single_node" />
+</launch>

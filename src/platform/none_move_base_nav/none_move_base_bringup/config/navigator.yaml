@@ -1,0 +1,17 @@
+action_name: /none_move_base/navigate_task
+global_goal_topic: /none_move_base/global_goal
+global_path_topic: /none_move_base/global_path
+tracking_state_topic: /none_move_base/path_tracking_state
+status_topic: /none_move_base/status
+behavior_state_topic: /none_move_base/behavior_state
+clear_path_topic: /none_move_base/clear_path
+pose_topic: /amcl_pose_tf
+
+planner_frame: map
+plan_timeout: 3.0
+blocked_timeout: 2.0
+action_timeout: 120.0
+
+default_xy_goal_tolerance: 0.12
+default_yaw_goal_tolerance: 0.17
+default_need_final_yaw: true

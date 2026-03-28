@@ -1,0 +1,6 @@
+string file_path
+bool reload_camera_poses
+---
+bool success
+string detail
+int32 station_count

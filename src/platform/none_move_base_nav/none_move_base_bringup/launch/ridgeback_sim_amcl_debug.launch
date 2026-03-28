@@ -1,0 +1,30 @@
+<launch>
+  <arg name="map_file" default="$(find ridgeback_navigation)/maps/ridgeback_map.yaml" />
+  <arg name="scan_topic" default="/scan_full_filtered" />
+  <arg name="initial_pose_x" default="0.0" />
+  <arg name="initial_pose_y" default="0.0" />
+  <arg name="initial_pose_a" default="0.0" />
+  <arg name="start_localization" default="true" />
+  <arg name="start_debug_tools" default="false" />
+  <arg name="start_rviz" default="false" />
+
+  <group if="$(arg start_localization)">
+    <include file="$(find none_move_base_bringup)/launch/include/ridgeback_sim_amcl_localization.launch">
+      <arg name="map_file" value="$(arg map_file)" />
+      <arg name="scan_topic" value="$(arg scan_topic)" />
+      <arg name="initial_pose_x" value="$(arg initial_pose_x)" />
+      <arg name="initial_pose_y" value="$(arg initial_pose_y)" />
+      <arg name="initial_pose_a" value="$(arg initial_pose_a)" />
+    </include>
+  </group>
+
+  <include file="$(find none_move_base_bringup)/launch/include/navigation_core.launch">
+    <arg name="local_config" value="$(find none_move_base_bringup)/config/local_controller_ridgeback_sim.yaml" />
+  </include>
+
+  <group if="$(arg start_debug_tools)">
+    <include file="$(find none_move_base_bringup)/launch/include/debug_tools.launch">
+      <arg name="start_rviz" value="$(arg start_rviz)" />
+    </include>
+  </group>
+</launch>

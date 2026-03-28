@@ -1,0 +1,27 @@
+<launch>
+  <arg name="start_rviz" default="false" />
+  <arg name="resolution" default="0.05" />
+
+  <param name="/use_sim_time" value="true" />
+
+  <node
+    name="cartographer_node"
+    pkg="cartographer_ros"
+    type="cartographer_node"
+    args="-configuration_directory $(find ridgeback_navigation)/params/carto_config -configuration_basename ridegback_carto.lua"
+    output="screen">
+    <remap from="scan" to="/scan_full_filtered" />
+  </node>
+
+  <node
+    name="cartographer_occupancy_grid_node"
+    pkg="cartographer_ros"
+    type="cartographer_occupancy_grid_node"
+    args="-resolution $(arg resolution)" />
+
+  <group if="$(arg start_rviz)">
+    <include file="$(find ridgeback_viz)/launch/view_robot.launch">
+      <arg name="config" value="cartographer" />
+    </include>
+  </group>
+</launch>

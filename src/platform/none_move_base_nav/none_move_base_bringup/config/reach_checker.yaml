@@ -1,0 +1,5 @@
+xy_goal_tolerance: 0.12
+yaw_goal_tolerance: 0.17
+success_latch_cycles: 5
+stop_linear_speed_threshold: 0.05
+stop_angular_speed_threshold: 0.10

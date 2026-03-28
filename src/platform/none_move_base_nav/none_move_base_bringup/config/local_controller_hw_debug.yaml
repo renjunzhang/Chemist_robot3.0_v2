@@ -1,0 +1,41 @@
+pose_topic: /amcl_pose_tf
+odom_topic: /odom
+scan_topic: /scan_full_filtered
+path_topic: /none_move_base/global_path
+clear_path_topic: /none_move_base/clear_path
+tracking_state_topic: /none_move_base/path_tracking_state
+cmd_vel_topic: /hf_platform/nav_vel
+
+control_frequency: 20.0
+path_timeout: 1.0
+
+preview_distance: 0.30
+near_goal_preview_distance: 0.10
+near_goal_distance: 0.35
+
+xy_goal_tolerance: 0.12
+yaw_goal_tolerance: 0.20
+need_final_yaw: true
+success_latch_cycles: 5
+
+k_position: 1.00
+k_heading: 1.20
+k_final_heading: 1.40
+
+max_vel_x: 0.12
+max_vel_y: 0.12
+max_wz: 0.35
+
+near_goal_max_vel_x: 0.08
+near_goal_max_vel_y: 0.08
+near_goal_max_wz: 0.25
+
+acc_lim_x: 0.30
+acc_lim_y: 0.30
+acc_lim_wz: 0.60
+
+min_cmd_vel_xy: 0.02
+min_cmd_wz: 0.04
+
+obstacle_stop_distance: 0.45
+obstacle_sector_width: 0.80

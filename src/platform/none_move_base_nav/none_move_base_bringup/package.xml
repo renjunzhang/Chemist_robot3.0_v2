@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>none_move_base_bringup</name>
+  <version>0.0.1</version>
+  <description>Launch and configuration for none_move_base phase 1.</description>
+
+  <maintainer email="a@todo.todo">a</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>cartographer_ros</exec_depend>
+  <exec_depend>docking_tf</exec_depend>
+  <exec_depend>hf_carto</exec_depend>
+  <exec_depend>hf_navigation</exec_depend>
+  <exec_depend>map_server</exec_depend>
+  <exec_depend>none_move_base_global</exec_depend>
+  <exec_depend>none_move_base_local</exec_depend>
+  <exec_depend>none_move_base_navigation</exec_depend>
+  <exec_depend>rviz</exec_depend>
+</package>

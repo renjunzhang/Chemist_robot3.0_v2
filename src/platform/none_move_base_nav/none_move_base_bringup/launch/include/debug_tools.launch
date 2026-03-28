@@ -1,0 +1,10 @@
+<launch>
+  <arg name="start_rviz" default="false" />
+
+  <node if="$(arg start_rviz)"
+        name="none_move_base_rviz"
+        pkg="rviz"
+        type="rviz"
+        output="screen"
+        args="-d $(find hf_navigation)/launch/aichem_carto.rviz" />
+</launch>

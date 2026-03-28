@@ -1,0 +1,28 @@
+# Goal
+string id
+string exper_no
+string action
+string destination
+geometry_msgs/PoseStamped target_pose
+bool use_named_station
+bool need_final_yaw
+bool enable_terminal_adjust
+string terminal_adjust_source
+float32 xy_goal_tolerance
+float32 yaw_goal_tolerance
+
+---
+# Result
+bool success
+int32 error_code
+string state
+string detail
+string current_station
+
+---
+# Feedback
+string phase
+string detail
+float32 distance_to_goal
+float32 yaw_error
+string current_station

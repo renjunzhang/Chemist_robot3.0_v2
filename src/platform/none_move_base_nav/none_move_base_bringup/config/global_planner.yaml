@@ -1,0 +1,13 @@
+planner_frame: map
+map_topic: /map
+pose_topic: /amcl_pose_tf
+goal_topic: /none_move_base/global_goal
+path_topic: /none_move_base/global_path
+
+occupied_threshold: 50
+allow_unknown: false
+inflation_radius: 0.20
+
+prune_collinear: true
+line_of_sight_prune: true
+resample_step: 0.08
