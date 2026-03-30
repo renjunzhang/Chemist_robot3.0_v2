@@ -39,6 +39,7 @@
 | `/odom` | `nav_msgs/Odometry` | 局部控制输入 |
 | `/amcl_pose_tf` | `geometry_msgs/PoseWithCovarianceStamped` | 当前位姿输入 |
 | `/scan_full_filtered` | `sensor_msgs/LaserScan` | 障碍感知输入 |
+| `/hf_platform/joy` | `sensor_msgs/Joy` | 最终速度门控输入（RB 按住才运行） |
 | `/tf_flash` | `std_msgs/String` | 终点微调可选输入，第一阶段不接，后续按需启用 |
 
 ## 3. 新内部标准接口
@@ -53,6 +54,9 @@
 | `/none_move_base/global_goal` | `geometry_msgs/PoseStamped` | 启用 | 启用 | navigation 发给 global |
 | `/none_move_base/global_path` | `nav_msgs/Path` | 启用 | 启用 | global 输出路径 |
 | `/none_move_base/path_tracking_state` | `PathTrackingState` | 启用 | 启用 | local 状态反馈 |
+| `/none_move_base/local_planner_cmd` | `geometry_msgs/Twist` | 预留 | 启用 | local_planner 输出给 local 执行层 |
+| `/none_move_base/local_planner_state` | `std_msgs/String`（暂定） | 预留 | 启用 | local_planner 诊断状态 |
+| `/none_move_base/local_obstacles` | 自定义 msg（预留） | 不接 | 可选 | 局部障碍集合（后续按需启用） |
 | `/none_move_base/status` | `NavigationStatus` | 可选 | 启用 | internal status 广播 |
 | `/none_move_base/behavior_state` | `BehaviorState` | 可选 | 启用 | behavior 状态广播 |
 | `/none_move_base/reload_station_poses` | `ReloadStationPoses.srv` | 不接 | 启用 | 站点表热更新 |
@@ -73,6 +77,16 @@
 2. `/none_move_base/global_path`
 3. `/none_move_base/path_tracking_state`
 
+第一阶段当前基线还依赖：
+
+1. `/odom`
+2. `/hf_platform/joy`
+
+第一阶段如果进入 MPC 试运行，新增最小中间接口：
+
+1. `/none_move_base/local_planner_cmd`
+2. `/none_move_base/local_planner_state`
+
 ## 5. 第二阶段再启用的接口
 
 这些接口留名不留实现，第二阶段再接：
@@ -86,6 +100,9 @@
 7. `/none_move_base/behavior_state`
 8. `/none_move_base/reload_station_poses`
 9. `/tf_flash`
+10. `/none_move_base/local_planner_cmd`
+11. `/none_move_base/local_planner_state`
+12. `/none_move_base/local_obstacles`
 
 ## 6. `geometry_msgs/Twist` 语义约束
 
@@ -200,3 +217,5 @@
 3. `NavigateTask.action` 的主字段集合
 4. `PathTrackingState.msg` 作为 local -> navigation 的反馈通道
 5. `NavigationStatus.msg` 作为 internal status 广播通道
+6. `none_move_base_local` 作为最终执行与安全门控层的角色边界
+7. `/none_move_base/local_planner_cmd` 作为 local_planner -> local 执行层接口名

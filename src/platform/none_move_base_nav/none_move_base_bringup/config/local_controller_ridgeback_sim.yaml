@@ -5,6 +5,13 @@ path_topic: /none_move_base/global_path
 clear_path_topic: /none_move_base/clear_path
 tracking_state_topic: /none_move_base/path_tracking_state
 cmd_vel_topic: /cmd_vel
+enable_button_topic: /hf_platform/joy
+require_enable_button: false
+enable_button_index: 5
+enable_release_timeout: 1.5
+enable_release_behavior: pause
+joy_msg_timeout: 0.3
+publish_zero_on_block: true
 
 control_frequency: 20.0
 path_timeout: 1.0

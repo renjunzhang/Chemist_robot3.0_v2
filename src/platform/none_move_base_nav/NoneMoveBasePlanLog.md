@@ -5,6 +5,7 @@
 3. 遇到问题追根因，不打补丁。每个决策都要能回答“为什么”。
 4. 输出说重点，砍掉一切不改变决策的信息。
 5. 修改日志记录在 “NoneMoveBasePlanLog.md”，目录更新原则和方案落实情况由 `README.md` 负责维护，`Debug.md` 只记录调试流程。
+6. 接口记录统一维护在 `/data/a/chemist_robot3.0/src/README/NoneMoveBaseReservedInterfaces.md`。
 
 # NoneMoveBasePlan 修改日志
 
@@ -48,3 +49,32 @@
 36. 新增 `send_relative_goal.py`，用于基于当前 `/amcl_pose_tf` 发送相对小目标，避免现场手算绝对坐标。
 37. 对 `send_relative_goal.py` 做 Python 语法检查，结果通过。
 38. 在 `Debug.md` 中新增实物联调章节，补充启动顺序、低速参数、相对目标、停机方法和分层排障顺序。
+
+## 2026-03-29
+
+39. 在 `none_move_base_local/src/local_controller_node.cpp` 增加最终速度输出口安全门控，直接订阅 `/hf_platform/joy` 并读取 `buttons[5]`。
+40. 新增门控参数：`require_enable_button`、`enable_button_topic`、`enable_button_index`、`enable_release_timeout`、`enable_release_behavior`、`joy_msg_timeout`、`publish_zero_on_block`。
+41. 实现“按住才运行”语义：使能键未按下时立即发布零速度，并阻断 tracker 控制量下发。
+42. 新增门控 detail：`hold_to_run_required`、`manual_hold_released`、`manual_hold_timeout_cleared`、`joy_timeout_fail_safe`，便于在线诊断。
+43. 新增二级保护：松手超过阈值且 `enable_release_behavior=cancel` 时自动 `clearPath`，避免重新按下后沿旧路径突进。
+44. 更新配置默认值：
+	- `local_controller.yaml`：门控默认开启
+	- `local_controller_hw_debug.yaml`：门控默认开启
+	- `local_controller_ridgeback_sim.yaml`：门控默认关闭
+45. 定向编译验证通过：执行 `catkin build none_move_base_local`，`none_move_base_msgs`、`none_move_base_common`、`none_move_base_local` 全部成功。
+46. 在 `README.md` 新增“安全门控（Hold-to-Run）”章节，记录参数、默认策略和快速回退步骤。
+47. 在 `Debug.md` 新增“手柄门控调试”和“门控快速回退”章节，补充现场排障与回滚流程。
+
+## 2026-03-30
+
+48. 新增 `MPC-D-CBF改进方案.md`，记录基于 `/home/a/scout_ws/src/MPC-D-CBF` 思路改造 `none_move_base_local` 的迁移方案。
+49. 在方案文档开头补充“协作原则”和“目录”章节，统一文档风格。
+50. 明确改造策略为“结构借鉴 + 算法核心迁移 + 接口适配”，不采用整仓直接复制。
+51. 明确新增三包建议：`none_move_base_obs_param`、`none_move_base_local_map`、`none_move_base_local_planner`，并保留 `none_move_base_local` 作为最终执行与安全门控层。
+52. 补充分阶段实施计划、验收标准、风险与回退策略，确保可调试、可回退、可并行验证。
+53. 根据对 `/home/a/scout_ws/src/MPC-D-CBF` 实码核查，确认其原始控制器为差速/独轮车模型，控制量为 `v + omega`，不适合直接用于当前全向麦轮底盘。
+54. 将 `MPC-D-CBF` 方案收紧为“只迁求解器核心，不迁 `controller.py`、`local_map`、`obs_param` 原始运行链”。
+55. 调整目录规划：第一版只建议新增 `none_move_base_local_planner/`，`none_move_base_local_map/` 和 `none_move_base_obs_param/` 改为后置可选项。
+56. 调整运行链路：第一版 `none_move_base_local_planner` 直接复用 `/none_move_base/global_path`、`/amcl_pose_tf`、`/odom`、`/scan_full_filtered`，输出 `/none_move_base/local_planner_cmd` 给 `none_move_base_local`。
+57. 在方案文档中明确第一版模型约束为全向 `vx + vy + wz`，并要求求解失败时零速与可回退到当前 tracker。
+58. 在 `README.md` 新增“局部算法升级路线”章节，明确当前稳定基线仍是 tracker，MPC-D-CBF 仅作为下一步局部算法升级路线。

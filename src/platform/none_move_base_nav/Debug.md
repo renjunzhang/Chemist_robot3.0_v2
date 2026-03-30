@@ -246,6 +246,38 @@
 2. 验证完整 action 入口：
    `rostopic pub -1 /none_move_base/navigate_task/goal none_move_base_msgs/NavigateTaskActionGoal "{goal: {id: 'debug_goal_1', exper_no: '', action: 'move', destination: '', target_pose: {header: {frame_id: 'map'}, pose: {position: {x: 1.0, y: 0.0, z: 0.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}}, use_named_station: false, need_final_yaw: true, enable_terminal_adjust: false, terminal_adjust_source: '', xy_goal_tolerance: 0.12, yaw_goal_tolerance: 0.17}}"`
 
+## 手柄门控调试（Hold-to-Run）
+
+1. 已启用门控的配置文件：
+   - `none_move_base_bringup/config/local_controller.yaml`
+   - `none_move_base_bringup/config/local_controller_hw_debug.yaml`
+2. 仿真默认关闭门控的配置文件：
+   - `none_move_base_bringup/config/local_controller_ridgeback_sim.yaml`
+3. 先确认手柄输入存在：
+   `rostopic echo -n1 /hf_platform/joy`
+4. 再观察门控状态细节：
+   `rostopic echo /none_move_base/path_tracking_state`
+5. 关键 detail 含义：
+   - `hold_to_run_required`：当前必须按住 RB 才允许运动
+   - `manual_hold_released`：短暂松手，暂停但保留路径
+   - `manual_hold_timeout_cleared`：松手超过阈值并触发清路径
+   - `joy_timeout_fail_safe`：手柄消息超时，强制零速
+6. 验证顺序建议：
+   - 按住 RB，确认有速度输出
+   - 松开 RB，确认同周期速度归零
+   - 松手小于阈值再按下，确认路径可继续
+   - 松手大于阈值且 `enable_release_behavior=cancel` 时，确认路径被清空
+
+## 门控快速回退
+
+1. 回退开关：将当前使用的 local 配置里的 `require_enable_button` 改为 `false`。
+2. 回退后重启新链：
+   `rosnode kill /none_move_base_local`
+3. 使用原启动命令重新拉起（例如 `parallel_debug.launch` 或 `ridgeback_sim_*`）。
+4. 回退验证：
+   `rostopic echo /none_move_base/path_tracking_state`
+5. 如果不再出现 `hold_to_run_required` / `manual_hold_released`，说明门控已关闭。
+
 ## 已知边界
 
 1. 阶段 1 只支持 `map` 坐标系的 `target_pose`。

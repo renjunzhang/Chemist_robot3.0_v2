@@ -67,6 +67,13 @@
 12. 已完成 ridgeback Cartographer 仿真建图入口：
    新增 `ridgeback_sim_carto_mapping.launch`，只启动 Cartographer 建图相关节点，不夹带旧 `move_base`。
 
+## 局部算法升级路线
+
+1. 当前稳定基线仍然是 `none_move_base_local` 内的轻量 Holonomic Path Tracker。
+2. 下一步局部算法升级将参考 `MPC-D-CBF`，但只迁移求解器思路，不直接复制其 `controller/local_map/obs_param` 运行链。
+3. 第一版升级只计划新增 `none_move_base_local_planner/`，直接复用当前的 `/none_move_base/global_path`、`/amcl_pose_tf`、`/odom`、`/scan_full_filtered`。
+4. `none_move_base_local` 继续保留为最终执行与安全层，手柄门控和最终零速保护不会被新求解器绕过。
+
 ## 当前阶段边界
 
 1. 阶段 1 只打通新导航链内部闭环，不接入旧 DMS 和旧 `task_communication`。
@@ -120,3 +127,42 @@
    `roslaunch none_move_base_bringup ridgeback_sim_debug.launch`
 5. 如果你要先在仿真里重新建一张 Cartographer 地图，使用：
    `roslaunch none_move_base_bringup ridgeback_sim_carto_mapping.launch`
+
+## 安全门控（Hold-to-Run）
+
+1. 阶段 1 已在 `none_move_base_local` 最终速度输出口加入手柄使能门控。
+2. 门控输入直接订阅 `/hf_platform/joy`，默认读取 `buttons[5]`（RB）。
+3. 仅当 `buttons[5] == 1` 时，局部控制输出才会真正发布到底盘速度话题。
+4. 当 `buttons[5] != 1` 时：
+   - 当前周期立即发布零速度
+   - 不下发 tracker 计算结果
+   - `/none_move_base/path_tracking_state.detail` 进入门控状态细分
+5. 当前门控相关 detail 取值：
+   - `hold_to_run_required`：尚未按住使能键
+   - `manual_hold_released`：使能键已松开，处于短暂停止
+   - `manual_hold_timeout_cleared`：松开超过阈值且触发清路径
+   - `joy_timeout_fail_safe`：手柄话题超时保护触发
+
+### 门控参数
+
+1. `require_enable_button`：是否启用按住才运行门控。
+2. `enable_button_topic`：手柄输入话题，默认 `/hf_platform/joy`。
+3. `enable_button_index`：按钮下标，默认 `5`。
+4. `enable_release_timeout`：松手超时阈值，默认 `1.5` 秒。
+5. `enable_release_behavior`：`pause` 或 `cancel`。
+6. `joy_msg_timeout`：手柄消息超时阈值，默认 `0.3` 秒。
+7. `publish_zero_on_block`：门控阻断时是否强制发布零速度。
+
+### 默认策略
+
+1. 实机配置默认开启门控：
+   - `none_move_base_bringup/config/local_controller.yaml`
+   - `none_move_base_bringup/config/local_controller_hw_debug.yaml`
+2. 仿真配置默认关闭门控：
+   - `none_move_base_bringup/config/local_controller_ridgeback_sim.yaml`
+
+### 快速回退
+
+1. 最小回退：将对应配置中的 `require_enable_button` 改为 `false`。
+2. 保守回退：同时将 `enable_release_behavior` 保持为 `pause`，避免误清路径。
+3. 修改参数后重启 `none_move_base_local` 节点生效。
