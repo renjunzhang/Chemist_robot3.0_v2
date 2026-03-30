@@ -7,9 +7,12 @@
 #include <sensor_msgs/Joy.h>
 #include <sensor_msgs/LaserScan.h>
 #include <std_msgs/Empty.h>
+#include <std_msgs/String.h>
 
 #include "none_move_base_common/frame_transform.h"
+#include "none_move_base_local/obstacle_adapter.h"
 #include "none_move_base_local/path_tracker_controller.h"
+#include "none_move_base_local/velocity_limiter.h"
 #include "none_move_base_msgs/PathTrackingState.h"
 
 namespace none_move_base_local {
@@ -19,7 +22,8 @@ public:
   LocalControllerNode()
       : private_nh_("~"), has_pose_(false), has_odom_(false), has_scan_(false),
         has_joy_(false), enable_button_pressed_(false), has_seen_enable_press_(false),
-        has_active_path_(false), release_active_(false), release_timeout_cleared_(false) {
+        has_active_path_(false), has_local_planner_cmd_(false),
+        release_active_(false), release_timeout_cleared_(false) {
     private_nh_.param<std::string>("pose_topic", pose_topic_, "/amcl_pose_tf");
     private_nh_.param<std::string>("odom_topic", odom_topic_, "/odom");
     private_nh_.param<std::string>("scan_topic", scan_topic_, "/scan_full_filtered");
@@ -30,6 +34,15 @@ public:
                                    "/none_move_base/path_tracking_state");
     private_nh_.param<std::string>("cmd_vel_topic", cmd_vel_topic_,
                                    "/hf_platform/nav_vel");
+    private_nh_.param<std::string>("local_mode", local_mode_, "tracker");
+    private_nh_.param<std::string>("local_planner_cmd_topic",
+                     local_planner_cmd_topic_,
+                     "/none_move_base/local_planner_cmd");
+    private_nh_.param<std::string>("local_planner_state_topic",
+                     local_planner_state_topic_,
+                     "/none_move_base/local_planner_state");
+    private_nh_.param("local_planner_cmd_timeout", local_planner_cmd_timeout_,
+              0.5);
     private_nh_.param<std::string>("enable_button_topic", enable_button_topic_,
                      "/hf_platform/joy");
     private_nh_.param("require_enable_button", require_enable_button_, false);
@@ -74,8 +87,19 @@ public:
     private_nh_.param("obstacle_stop_distance", obstacle_stop_distance, 0.35);
     private_nh_.param("obstacle_sector_width", obstacle_sector_width, 0.70);
 
+    max_vel_x_ = params.max_vel_x;
+    max_vel_y_ = params.max_vel_y;
+    max_wz_ = params.max_wz;
+    near_goal_max_vel_x_ = params.near_goal_max_vel_x;
+    near_goal_max_vel_y_ = params.near_goal_max_vel_y;
+    near_goal_max_wz_ = params.near_goal_max_wz;
+    min_cmd_vel_xy_ = params.min_cmd_vel_xy;
+    min_cmd_wz_ = params.min_cmd_wz;
+
     controller_.configure(params, acc_lim_x, acc_lim_y, acc_lim_wz,
                           obstacle_stop_distance, obstacle_sector_width);
+    mpc_velocity_limiter_.configure(acc_lim_x, acc_lim_y, acc_lim_wz);
+    mpc_obstacle_adapter_.configure(obstacle_stop_distance, obstacle_sector_width);
 
     pose_sub_ =
         nh_.subscribe(pose_topic_, 1, &LocalControllerNode::poseCallback, this);
@@ -85,6 +109,12 @@ public:
         nh_.subscribe(scan_topic_, 1, &LocalControllerNode::scanCallback, this);
     path_sub_ =
         nh_.subscribe(path_topic_, 1, &LocalControllerNode::pathCallback, this);
+    local_planner_cmd_sub_ = nh_.subscribe(local_planner_cmd_topic_, 1,
+                         &LocalControllerNode::localPlannerCmdCallback,
+                         this);
+    local_planner_state_sub_ = nh_.subscribe(
+      local_planner_state_topic_, 1,
+      &LocalControllerNode::localPlannerStateCallback, this);
     joy_sub_ =
       nh_.subscribe(enable_button_topic_, 1, &LocalControllerNode::joyCallback, this);
     clear_path_sub_ = nh_.subscribe(clear_path_topic_, 1,
@@ -120,6 +150,19 @@ private:
     controller_.setPath(*msg);
     last_path_time_ = ros::Time::now();
     has_active_path_ = !msg->poses.empty();
+    if (!has_active_path_) {
+      has_local_planner_cmd_ = false;
+    }
+  }
+
+  void localPlannerCmdCallback(const geometry_msgs::TwistConstPtr &msg) {
+    latest_local_planner_cmd_ = *msg;
+    last_local_planner_cmd_time_ = ros::Time::now();
+    has_local_planner_cmd_ = true;
+  }
+
+  void localPlannerStateCallback(const std_msgs::StringConstPtr &msg) {
+    latest_local_planner_state_ = msg->data;
   }
 
   void joyCallback(const sensor_msgs::JoyConstPtr &msg) {
@@ -188,6 +231,31 @@ private:
     return false;
   }
 
+  bool isMpcMode() const { return local_mode_ == "mpc_dcbf"; }
+
+  geometry_msgs::Twist clampMpcCommand(const geometry_msgs::Twist &raw,
+                                       bool near_goal) const {
+    geometry_msgs::Twist cmd = raw;
+    const double max_vx = near_goal ? near_goal_max_vel_x_ : max_vel_x_;
+    const double max_vy = near_goal ? near_goal_max_vel_y_ : max_vel_y_;
+    const double max_wz = near_goal ? near_goal_max_wz_ : max_wz_;
+
+    cmd.linear.x = std::max(-max_vx, std::min(max_vx, cmd.linear.x));
+    cmd.linear.y = std::max(-max_vy, std::min(max_vy, cmd.linear.y));
+    cmd.angular.z = std::max(-max_wz, std::min(max_wz, cmd.angular.z));
+
+    if (std::fabs(cmd.linear.x) < min_cmd_vel_xy_) {
+      cmd.linear.x = 0.0;
+    }
+    if (std::fabs(cmd.linear.y) < min_cmd_vel_xy_) {
+      cmd.linear.y = 0.0;
+    }
+    if (std::fabs(cmd.angular.z) < min_cmd_wz_) {
+      cmd.angular.z = 0.0;
+    }
+    return cmd;
+  }
+
   void controlTimerCallback(const ros::TimerEvent &event) {
     none_move_base_msgs::PathTrackingState state;
     state.header.stamp = ros::Time::now();
@@ -247,6 +315,75 @@ private:
 
     has_active_path_ = output.has_path;
 
+    if (isMpcMode()) {
+      if (!has_local_planner_cmd_ ||
+          (ros::Time::now() - last_local_planner_cmd_time_).toSec() >
+              local_planner_cmd_timeout_) {
+        state.has_path = has_active_path_;
+        state.goal_reached = false;
+        state.oscillating = false;
+        state.blocked = false;
+        state.cross_track_error = output.cross_track_error;
+        state.heading_error = output.heading_error;
+        state.remaining_distance = output.remaining_distance;
+        state.commanded_vx = 0.0;
+        state.commanded_vy = 0.0;
+        state.commanded_wz = 0.0;
+        state.tracking_status = 4;
+        state.detail = "mpc_cmd_timeout";
+        tracking_state_pub_.publish(state);
+        publishZero();
+        return;
+      }
+
+      geometry_msgs::Twist command =
+          clampMpcCommand(latest_local_planner_cmd_, output.near_goal);
+      const double command_heading =
+          std::atan2(command.linear.y, command.linear.x);
+      const double command_xy_speed =
+          std::hypot(command.linear.x, command.linear.y);
+      if (has_scan_ && command_xy_speed > 1e-3 &&
+          mpc_obstacle_adapter_.isBlocked(current_scan_, command_heading)) {
+        command = geometry_msgs::Twist();
+        state.blocked = true;
+        state.tracking_status = 5;
+        state.detail = "mpc_blocked_by_scan";
+      } else {
+        command = mpc_velocity_limiter_.limit(command, last_mpc_command_, dt);
+      }
+      if (output.goal_reached) {
+        command = geometry_msgs::Twist();
+      }
+      last_mpc_command_ = command;
+
+      state.has_path = has_active_path_;
+      state.goal_reached = output.goal_reached;
+      state.oscillating = output.oscillating;
+      state.blocked = output.blocked;
+      state.cross_track_error = output.cross_track_error;
+      state.heading_error = output.heading_error;
+      state.remaining_distance = output.remaining_distance;
+      state.commanded_vx = command.linear.x;
+      state.commanded_vy = command.linear.y;
+      state.commanded_wz = command.angular.z;
+      if (state.tracking_status != 5) {
+        state.tracking_status = output.tracking_status > 0 ? output.tracking_status : 1;
+      }
+      if (output.goal_reached) {
+        state.detail = "goal_reached";
+      } else if (state.detail == "mpc_blocked_by_scan") {
+        // Keep explicit blocker detail from final execution safety layer.
+      } else if (!latest_local_planner_state_.empty()) {
+        state.detail = latest_local_planner_state_;
+      } else {
+        state.detail = "mpc_dcbf_tracking";
+      }
+
+      cmd_pub_.publish(command);
+      tracking_state_pub_.publish(state);
+      return;
+    }
+
     state.has_path = output.has_path;
     state.goal_reached = output.goal_reached;
     state.oscillating = output.oscillating;
@@ -273,6 +410,8 @@ private:
   ros::Subscriber odom_sub_;
   ros::Subscriber scan_sub_;
   ros::Subscriber path_sub_;
+  ros::Subscriber local_planner_cmd_sub_;
+  ros::Subscriber local_planner_state_sub_;
   ros::Subscriber joy_sub_;
   ros::Subscriber clear_path_sub_;
   ros::Publisher cmd_pub_;
@@ -286,9 +425,13 @@ private:
   std::string clear_path_topic_;
   std::string tracking_state_topic_;
   std::string cmd_vel_topic_;
+  std::string local_mode_;
+  std::string local_planner_cmd_topic_;
+  std::string local_planner_state_topic_;
   std::string enable_button_topic_;
   double control_frequency_;
   double path_timeout_;
+  double local_planner_cmd_timeout_;
   bool require_enable_button_;
   int enable_button_index_;
   double enable_release_timeout_;
@@ -303,15 +446,31 @@ private:
   bool enable_button_pressed_;
   bool has_seen_enable_press_;
   bool has_active_path_;
+  bool has_local_planner_cmd_;
   bool release_active_;
   bool release_timeout_cleared_;
   ros::Time last_path_time_;
+  ros::Time last_local_planner_cmd_time_;
   ros::Time last_joy_time_;
   ros::Time release_start_time_;
+  std::string latest_local_planner_state_;
+  geometry_msgs::Twist latest_local_planner_cmd_;
+  geometry_msgs::Twist last_mpc_command_;
   geometry_msgs::PoseStamped current_pose_;
   geometry_msgs::Twist current_velocity_;
   sensor_msgs::LaserScan current_scan_;
   PathTrackerController controller_;
+  ObstacleAdapter mpc_obstacle_adapter_;
+  VelocityLimiter mpc_velocity_limiter_;
+
+  double max_vel_x_;
+  double max_vel_y_;
+  double max_wz_;
+  double near_goal_max_vel_x_;
+  double near_goal_max_vel_y_;
+  double near_goal_max_wz_;
+  double min_cmd_vel_xy_;
+  double min_cmd_wz_;
 };
 
 } // namespace none_move_base_local

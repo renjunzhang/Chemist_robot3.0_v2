@@ -38,11 +38,14 @@
    用途：放 A* 全局规划实现。
 5. `none_move_base_local/`
    当前阶段：阶段 1
-   用途：放轻量 Holonomic Path Tracker。
+   用途：放最终执行与安全层（速度出口、门控、模式切换）。
 6. `none_move_base_navigation/`
    当前阶段：阶段 1
    用途：放内部导航任务执行和状态编排。
-7. `none_move_base_adapter/`
+7. `none_move_base_local_planner/`
+   当前阶段：阶段 1（升级试运行）
+   用途：放 MPC-D-CBF 第一版局部规划节点与参数接口（输出 `local_planner_cmd`）。
+8. `none_move_base_adapter/`
    当前阶段：阶段 2 预留
    用途：后续对接旧 `/obsNavigation_*` 业务接口。
 
@@ -66,6 +69,10 @@
    新增 `ridgeback_sim_amcl_debug.launch`，支持直接使用 `pgm + yaml` 地图进行仿真定位，不依赖 `pbstream`。
 12. 已完成 ridgeback Cartographer 仿真建图入口：
    新增 `ridgeback_sim_carto_mapping.launch`，只启动 Cartographer 建图相关节点，不夹带旧 `move_base`。
+13. 已完成 `none_move_base_local_planner` 第一版接口骨架：
+   新增 `mpc_dcbf_planner_node`，固定输入 `global_path + amcl_pose_tf + odom + scan_full_filtered`，输出 `/none_move_base/local_planner_cmd` 与 `/none_move_base/local_planner_state`。
+14. 已完成 local 双模式接入：
+   `none_move_base_local` 新增 `tracker/mpc_dcbf` 模式切换参数，并提供 `navigation_core_mpcdcbf.launch` 与 `local_planner_mpcdcbf.yaml` 用于升级链路联调。
 
 ## 局部算法升级路线
 

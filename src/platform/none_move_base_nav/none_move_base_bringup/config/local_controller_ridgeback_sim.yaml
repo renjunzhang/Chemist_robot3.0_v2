@@ -5,6 +5,10 @@ path_topic: /none_move_base/global_path
 clear_path_topic: /none_move_base/clear_path
 tracking_state_topic: /none_move_base/path_tracking_state
 cmd_vel_topic: /cmd_vel
+local_mode: tracker
+local_planner_cmd_topic: /none_move_base/local_planner_cmd
+local_planner_state_topic: /none_move_base/local_planner_state
+local_planner_cmd_timeout: 0.5
 enable_button_topic: /hf_platform/joy
 require_enable_button: false
 enable_button_index: 5

@@ -1,0 +1,37 @@
+path_topic: /none_move_base/global_path
+pose_topic: /amcl_pose_tf
+odom_topic: /odom
+scan_topic: /scan_full_filtered
+cmd_topic: /none_move_base/local_planner_cmd
+state_topic: /none_move_base/local_planner_state
+
+control_frequency: 20.0
+path_timeout: 1.0
+preview_distance: 0.25
+near_goal_distance: 0.40
+near_goal_linear_scale: 0.35
+
+mpc_horizon_steps: 10
+mpc_dt: 0.08
+sample_vx_count: 5
+sample_vy_count: 5
+sample_wz_count: 5
+
+w_pos: 4.0
+w_yaw: 1.0
+w_terminal_pos: 6.0
+w_terminal_yaw: 1.5
+w_control: 0.08
+w_smooth: 0.45
+w_obs: 3.0
+
+obs_hard_distance: 0.38
+obs_influence_distance: 0.75
+max_obstacle_points: 100
+
+xy_goal_tolerance: 0.12
+yaw_goal_tolerance: 0.20
+
+max_vel_x: 0.08
+max_vel_y: 0.08
+max_wz: 0.25

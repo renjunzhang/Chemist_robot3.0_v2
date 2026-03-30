@@ -8,7 +8,7 @@ import rospy
 from actionlib_msgs.msg import GoalStatus
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped, Twist
 from nav_msgs.msg import MapMetaData, OccupancyGrid, Odometry
-from sensor_msgs.msg import LaserScan
+from sensor_msgs.msg import Joy, LaserScan
 from tf.transformations import quaternion_from_euler
 
 from none_move_base_msgs.msg import NavigateTaskAction, NavigateTaskGoal
@@ -23,6 +23,7 @@ class Phase1SmokeTest:
         )
         self.odom_pub = rospy.Publisher("/odom", Odometry, queue_size=1)
         self.scan_pub = rospy.Publisher("/scan_full_filtered", LaserScan, queue_size=1)
+        self.joy_pub = rospy.Publisher("/hf_platform/joy", Joy, queue_size=1)
         rospy.Subscriber("/hf_platform/nav_vel", Twist, self.cmd_callback, queue_size=1)
         self.client = actionlib.SimpleActionClient(
             "/none_move_base/navigate_task", NavigateTaskAction
@@ -88,6 +89,14 @@ class Phase1SmokeTest:
         msg.ranges = [8.0] * count
         self.scan_pub.publish(msg)
 
+    def publish_joy(self, stamp, hold_enable=True):
+        msg = Joy()
+        msg.header.stamp = stamp
+        # Match local_controller default: enable_button_index=5 (RB).
+        msg.buttons = [0] * 6
+        msg.buttons[5] = 1 if hold_enable else 0
+        self.joy_pub.publish(msg)
+
     def publish_static_inputs(self, grid, x, y, yaw, vx, vy, wz):
         stamp = rospy.Time.now()
         grid.header.stamp = stamp
@@ -95,6 +104,7 @@ class Phase1SmokeTest:
         self.publish_pose(x, y, yaw, stamp)
         self.publish_odom(vx, vy, wz, stamp)
         self.publish_scan(stamp)
+        self.publish_joy(stamp, hold_enable=True)
 
     def build_goal(self):
         goal = NavigateTaskGoal()

@@ -42,6 +42,96 @@
 4. 当前已验证：
    上述 launch 可以正常拉起 `/none_move_base_global`、`/none_move_base_local`、`/none_move_base_navigation` 三个节点。
 
+## MPC 一键入口
+
+1. 新增一键入口：
+   `roslaunch none_move_base_bringup parallel_debug_mpcdcbf.launch start_localization:=true start_debug_tools:=false`
+2. 这个入口会拉起：
+   - `none_move_base_global`
+   - `none_move_base_local_planner`
+   - `none_move_base_local`（自动设置 `local_mode=mpc_dcbf`）
+   - `none_move_base_navigation`
+3. 如需使用实机低速参数，可覆盖：
+   `local_config:=/data/a/chemist_robot3.0/src/platform/none_move_base_nav/none_move_base_bringup/config/local_controller_hw_debug.yaml`
+4. 如需覆盖 mpc 参数，可覆盖：
+   `local_planner_config:=/data/a/chemist_robot3.0/src/platform/none_move_base_nav/none_move_base_bringup/config/local_planner_mpcdcbf.yaml`
+
+## MPC 第一轮联调检查单
+
+### A. 话题连通
+
+1. 先看核心节点：
+   `rosnode list | grep none_move_base`
+2. 确认 local planner 有输出：
+   `rostopic echo /none_move_base/local_planner_cmd`
+3. 确认 local planner 状态在更新：
+   `rostopic echo /none_move_base/local_planner_state`
+4. 确认最终输出链仍在：
+   `rostopic echo /hf_platform/nav_vel`
+
+### B. 模式切换
+
+1. 确认当前模式参数：
+   `rosparam get /none_move_base_local/local_mode`
+2. 一键 mpc 入口预期结果：
+   返回 `mpc_dcbf`
+3. 如需回到旧 tracker：
+   在 local 配置将 `local_mode` 改回 `tracker` 后重启 `none_move_base_local`。
+
+### C. 超时保护
+
+1. 停掉 local planner 节点模拟超时：
+   `rosnode kill /none_move_base_local_planner`
+2. 预期行为：
+   - `/hf_platform/nav_vel` 回零
+   - `/none_move_base/path_tracking_state` 出现 `mpc_cmd_timeout`
+3. 恢复后检查：
+   重启 `none_move_base_local_planner`，确认 `local_planner_cmd` 恢复更新。
+
+### D. 门控生效
+
+1. 按住 RB 时：
+   预期 `/hf_platform/nav_vel` 随 `local_planner_cmd` 变化。
+2. 松开 RB 时：
+   预期同周期零速，`path_tracking_state.detail` 进入门控相关状态（如 `manual_hold_released`）。
+3. 手柄话题超时时：
+   预期零速并出现 `joy_timeout_fail_safe`。
+
+## MPC 第二步：最小障碍约束联调与参数收敛
+
+### A. 推荐调参配置
+
+1. 实机首轮（保守低速）建议使用：
+   `local_planner_config:=/data/a/chemist_robot3.0/src/platform/none_move_base_nav/none_move_base_bringup/config/local_planner_mpcdcbf_hw_debug.yaml`
+2. 仿真首轮建议使用：
+   `local_planner_config:=/data/a/chemist_robot3.0/src/platform/none_move_base_nav/none_move_base_bringup/config/local_planner_mpcdcbf_sim_debug.yaml`
+
+### B. 实机联调启动命令（MPC 一键入口）
+
+1. `source /data/a/chemist_robot3.0/devel/setup.bash`
+2. `roslaunch none_move_base_bringup parallel_debug_mpcdcbf.launch local_config:=/data/a/chemist_robot3.0/src/platform/none_move_base_nav/none_move_base_bringup/config/local_controller_hw_debug.yaml local_planner_config:=/data/a/chemist_robot3.0/src/platform/none_move_base_nav/none_move_base_bringup/config/local_planner_mpcdcbf_hw_debug.yaml start_localization:=true start_debug_tools:=false`
+
+### C. 第二步最小检查项（障碍约束）
+
+1. 空旷区域发小目标，确认能走且无明显抖动。
+2. 在车前 0.5m 放置障碍，确认减速并保持可控绕行/等待，不出现突进。
+3. 将障碍靠近到安全边界，确认触发 `mpc_solve_failed` 或明显保守行为，并保持最终输出可回零。
+4. 移除障碍后再次发目标，确认可恢复跟踪。
+
+### D. 参数收敛顺序（只改 4 组）
+
+1. 安全距离组：`obs_hard_distance`、`obs_influence_distance`
+2. 轨迹平滑组：`w_smooth`、`w_control`
+3. 跟踪误差组：`w_pos`、`w_yaw`、`w_terminal_pos`、`w_terminal_yaw`
+4. 速度能力组：`max_vel_x`、`max_vel_y`、`max_wz`、`near_goal_linear_scale`
+
+### E. 判定标准（第二步完成）
+
+1. 在障碍贴近场景下不发生突进。
+2. 失败场景可诊断（`/none_move_base/local_planner_state` 与 `/none_move_base/path_tracking_state` 有可读状态）。
+3. 松开 RB 或 local planner 超时后均能回零。
+4. 至少连续 10 次短距目标测试无异常跳变。
+
 ## 实物联调
 
 1. 明天现场联调只做阶段 1，不接 DMS，不启动旧 `task_communication`，不启动旧 `hf_navigation.launch`。

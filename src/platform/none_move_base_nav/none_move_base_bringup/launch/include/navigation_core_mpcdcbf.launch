@@ -1,0 +1,21 @@
+<launch>
+  <arg name="global_config" default="$(find none_move_base_bringup)/config/global_planner.yaml" />
+  <arg name="local_config" default="$(find none_move_base_bringup)/config/local_controller.yaml" />
+  <arg name="local_planner_config" default="$(find none_move_base_bringup)/config/local_planner_mpcdcbf.yaml" />
+  <arg name="navigator_config" default="$(find none_move_base_bringup)/config/navigator.yaml" />
+  <arg name="reach_checker_config" default="$(find none_move_base_bringup)/config/reach_checker.yaml" />
+  <arg name="behavior_config" default="$(find none_move_base_bringup)/config/behavior.yaml" />
+
+  <rosparam file="$(arg global_config)" command="load" ns="none_move_base_global" />
+  <rosparam file="$(arg local_config)" command="load" ns="none_move_base_local" />
+  <rosparam file="$(arg local_planner_config)" command="load" ns="none_move_base_local_planner" />
+  <param name="none_move_base_local/local_mode" value="mpc_dcbf" />
+  <rosparam file="$(arg navigator_config)" command="load" ns="none_move_base_navigation" />
+  <rosparam file="$(arg reach_checker_config)" command="load" ns="none_move_base_navigation" />
+  <rosparam file="$(arg behavior_config)" command="load" ns="none_move_base_navigation" />
+
+  <node pkg="none_move_base_global" type="global_planner_node" name="none_move_base_global" output="screen" />
+  <node pkg="none_move_base_local_planner" type="mpc_dcbf_planner_node" name="none_move_base_local_planner" output="screen" />
+  <node pkg="none_move_base_local" type="local_controller_node" name="none_move_base_local" output="screen" />
+  <node pkg="none_move_base_navigation" type="navigator_server_node" name="none_move_base_navigation" output="screen" />
+</launch>
